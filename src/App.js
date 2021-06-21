@@ -86,13 +86,21 @@ function App() {
       await transaction.wait().then(data => {
         if (typeof data !== 'undefined') {
           console.log(data);
+          console.log('Su número elegido fue: '+convertHexToDec(data.events[0].args.solution._hex));
+          console.log('Su número aleatorio fue: '+convertHexToDec(data.events[0].args.randomNumber._hex));
+          console.log('El costo de la operación fue : '+convertHexToDec(data.events[0].args.solution._hex) + ' JMT');
+          console.log('La prueba fue superada : '+data.events[0].args.state);
           console.log(`Operacion realizada correctamente a la cuenta ${secretAddress}`);
-        } else {
-          console.log('Error, la solución no es correcta')
         }
       }).catch((err) => (console.log(err)))
-
     }
+  }
+
+  function convertHexToDec(hexNumber){
+    let decNumber = 0;
+    decNumber = parseInt(hexNumber, 16);
+
+    return decNumber;
   }
 
   async function sendCoins() {
