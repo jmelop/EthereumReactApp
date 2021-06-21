@@ -8,8 +8,12 @@ contract Token {
     string public name = "Juan Melo Token";
     string public symbol = "JMT";
     uint256 public totalSupply = 1000000;
+    uint256 public result = 0;
+    string public operation = "";
     address public owner;
     mapping(address => uint256) balances;
+
+    event Number(string, uint256 randomNumber, string, uint256 solution, string, uint256 reward, string, bool state);
 
     constructor() {
         balances[msg.sender] = totalSupply;
@@ -46,12 +50,20 @@ contract Token {
         balances[to] += amount;
     }
 
-    function calculateMathProblem(address to, uint256 solution) external {
+    function guessNumber(address to, uint256 solution) external {
         uint256 randomNumber = generateRandomNumber();
-        require(solution == randomNumber, "Solucion incorrecta!");
-        balances[msg.sender] -= 20;
-        balances[to] += 20;
-        console.log("nice");
+        bool state = false;
+        uint256 entryCommission = 20;
+        if(randomNumber == solution){
+            state = true;
+            balances[msg.sender] -= entryCommission;
+            balances[to] += entryCommission;
+        } else {
+            state = false;
+            console.log('error');
+        }
+        
+        emit Number("El numero generado fue: ", randomNumber, " su solucion fue: ", solution,  " y la entrada es de: ", entryCommission, " JMT, con el estado: ", state);
     }
 
     function balanceOf(address account) external view returns (uint256) {

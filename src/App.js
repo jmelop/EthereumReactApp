@@ -6,14 +6,15 @@ import './index.css';
 import logo from '../src/assets/giphy.gif'
 import Web3 from 'web3'
 
-
-const tokenAddress = '0x0165878A594ca255338adfa4d48449f69242Eb8F';
+const tokenAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512';
 
 function App() {
 
   const [userAccount, setUserAccount] = useState('');
   const [amount, setAmount] = useState(0);
   var wallet = '';
+/*   var success = false;
+  var error = false; */
   getTypeWallet();
 
 
@@ -60,7 +61,7 @@ function App() {
       const contract = new ethers.Contract(tokenAddress, Token.abi, provider)
       const balance = await contract.balanceOf(account);
 
-      const ethBalance = web3.eth.getBalance(account).then(balance => {
+      web3.eth.getBalance(account).then(balance => {
         let balanceFormatted = balance.toString();
         balanceFormatted = balanceFormatted.slice(0, -12);
         console.log('Balance ETH: ' + balanceFormatted.toString());
@@ -73,24 +74,26 @@ function App() {
   }
 
 
-   async function initializeMathProblem(){
+  async function findRandomNumber() {
     if (wallet) {
+      const secretAddress = process.env.REACT_APP_CLUB_ADDRESS;
       await requestAccount();
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const contract = new ethers.Contract(tokenAddress, Token.abi, signer);
-      const transaction = await contract.calculateMathProblem(userAccount, 4);
-      await transaction.wait().then(u => {
-        if(typeof u !== 'undefined'){
-        console.log(u);
+      const transaction = await contract.guessNumber(secretAddress, 23);
+
+      await transaction.wait().then(data => {
+        if (typeof data !== 'undefined') {
+          console.log(data);
+          console.log(`Operacion realizada correctamente a la cuenta ${secretAddress}`);
         } else {
           console.log('Error, la solución no es correcta')
         }
       }).catch((err) => (console.log(err)))
-      console.log(`Coins successfully sent to ${userAccount}`);
 
     }
-  } 
+  }
 
   async function sendCoins() {
     if (wallet) {
@@ -109,15 +112,17 @@ function App() {
       <header className="App-header">
         <img src={logo} alt="loading..." class="w-40 mb-8" />
         <p>Type of wallet: {wallet}</p>
+{/*         { error ? <p class="text-gray-800" >No acerto!</p> : null }
+        { success ? <p class="text-gray-800">Si acerto!</p> : null } */}
         <div class="flex">
           <div class="p-20 flex flex-col container bg-gray-100 items-center m-2 rounded-lg">
-            <input class="rounded m-1 text-gray-700" onChange={e => setUserAccount(e.target.value)} placeholder="Account ID"/>
+            <input class="rounded m-1 text-gray-700" onChange={e => setUserAccount(e.target.value)} placeholder="Account ID" />
             <input type="number" class="rounded text-gray-700	"
               onChange={e => setAmount(e.target.value)} placeholder="Amount" />
             <button class="bg-white text-gray-700 m-2 rounded-lg p-1.5 mt-8" onClick={getBalance}>Get Balance</button>
             <button class="bg-white text-gray-700 m-2 rounded-lg p-1.5" onClick={sendCoins}>Send Coins</button>
             <button class="bg-white text-gray-700 m-2 rounded-lg p-1.5" onClick={getWalletInfo}>Get Wallet Info</button>
-            {<button class="bg-white text-gray-700 m-2 rounded-lg p-1.5" onClick={initializeMathProblem}>Math Problem</button>} 
+            <button class="bg-white text-gray-700 m-2 rounded-lg p-1.5" onClick={findRandomNumber}>Math Problem</button>
           </div>
         </div>
 
